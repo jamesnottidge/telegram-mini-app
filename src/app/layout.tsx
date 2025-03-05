@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import TonProvider from "@/components/TonProvider";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -28,7 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Script
+          src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"
+          strategy="beforeInteractive"
+        />
+        <TonProvider>{children}</TonProvider>
       </body>
     </html>
   );
