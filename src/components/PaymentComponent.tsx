@@ -117,6 +117,8 @@ class TonConnectSender implements Sender {
   }
 }
 
+const JETTON_ADDRESS = "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs";
+
 export default function RampPaymentInterface() {
   const [amount, setAmount] = useState("");
   const [network, setNetwork] = useState("TRC20");
@@ -161,7 +163,11 @@ export default function RampPaymentInterface() {
     pinataSecretKey: process.env.PINATA_SECRET!,
   };
 
-  const sendUSDTTransaction = async () => {
+  const sendUSDTTransaction = async (
+    receiverWalletAddress: string,
+    amount: string,
+    comment: string = ""
+  ) => {
     if (!sender) {
       console.error("Sender not initialized");
       return;
@@ -175,9 +181,24 @@ export default function RampPaymentInterface() {
 
     console.log("Using wallet", sdk.sender?.address?.toString());
     console.log("Using wallet", sdk.sender?.address?.toRawString());
-  };
 
-  sendUSDTTransaction();
+    const jetton = sdk.openJettonWallet(Address.parse(JETTON_ADDRESS));
+    const receiverAddress = Address.parse(receiverWalletAddress);
+    const amountInMicroUSDT = BigInt(parseInt(amount) * 1_000_000); // For USDT (6 decimals)
+
+    // If comment is provided, create a payload cell with the comment
+    let payload: Cell | undefined;
+    if (comment) {
+      payload = beginCell()
+        .storeUint(0, 32) // operation code 0 for comment
+        .storeStringTail(comment) // store the comment
+        .endCell();
+    }
+
+    jetton.send(sender, receiverAddress, amountInMicroUSDT, {
+      customPayload: payload,
+    });
+  };
 
   //   useEffect(() => {
   //     if (!userWalletAddress) return;
@@ -221,38 +242,38 @@ export default function RampPaymentInterface() {
     // Add your payment submission logic here
     console.log("Payment Details:", { amount, network, reference });
     // @ts-expect-error to test run
-    window && window.ramp.initialize({
-        // public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
-        // production
-        public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
-        //   staging
-        //   public_key: "pub_f1JEanki4Ci8bkCJ8825kYHPFhg9LZSD",
-        reference: reference,
-        from_currency: "usdt",
-        to_currency: "ngn",
-        from_amount: amount,
-        mode: "sell",
-        network: network,
-        // @ts-expect-error to test run
-        onClose: function (ref) {
-          // Handle when the modal is closed
-          console.log("onClose", ref);
-        },
+    window.ramp.initialize({
+      // public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
+      // production
+      public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
+      //   staging
+      //   public_key: "pub_f1JEanki4Ci8bkCJ8825kYHPFhg9LZSD",
+      reference: reference,
+      from_currency: "usdt",
+      to_currency: "ngn",
+      from_amount: amount,
+      mode: "sell",
+      network: network,
+      // @ts-expect-error to test run
+      onClose: function (ref) {
+        // Handle when the modal is closed
+        console.log("onClose", ref);
+      },
 
-        // @ts-expect-error to test run
-        onSuccess: function (transaction) {
-          // Handle when the transaction is successful
-          console.log("onSuccess", transaction);
-        },
+      // @ts-expect-error to test run
+      onSuccess: function (transaction) {
+        // Handle when the transaction is successful
+        console.log("onSuccess", transaction);
+      },
 
-        // @ts-expect-error to test run
-        onReceiveWalletDetails: function (walletDetails) {
-          console.log(walletDetails.amount);
-          tonConnectUI.sendTransaction(
-            generateTransaction(walletDetails.amount, walletDetails.address)
-          );
-        },
-      });
+      // @ts-expect-error to test run
+      onReceiveWalletDetails: function (walletDetails) {
+        console.log(walletDetails.amount);
+        tonConnectUI.sendTransaction(
+          generateTransaction(walletDetails.amount, walletDetails.address)
+        );
+      },
+    });
   };
 
   return (
@@ -284,7 +305,6 @@ export default function RampPaymentInterface() {
                 required
               />
             </div>
-
             <div>
               <label
                 htmlFor="network"
@@ -316,7 +336,6 @@ export default function RampPaymentInterface() {
                 </svg>
               </div>
             </div>
-
             <button
               type="submit"
               className="w-full py-3 bg-neutral-800 text-white rounded-lg 
@@ -325,6 +344,21 @@ export default function RampPaymentInterface() {
                          transition-colors duration-300"
             >
               Continue to Payment
+            </button>
+            <button
+              className="w-full py-3 bg-neutral-800 text-white rounded-lg 
+                         hover:bg-neutral-700 focus:outline-none 
+                         focus:ring-2 focus:ring-neutral-500 
+                         transition-colors duration-300"
+              onClick={() =>
+                sendUSDTTransaction(
+                  "UQCzTH14er4qh4gDlAsgg0NBve7hMpg2fDXR2H52skAKptPY",
+                  "1",
+                  "99BCA95095767D281374"
+                )
+              }
+            >
+              Send USDT
             </button>
           </form>
 
