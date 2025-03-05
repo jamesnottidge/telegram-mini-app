@@ -146,6 +146,12 @@ export default function RampPaymentInterface() {
         "Connected wallet address:",
         wallet.account?.address.toString()
       );
+      console.log("Connected wallet address:", wallet.account?.publicKey);
+      console.log("Connected wallet address:", wallet.account?.address);
+      console.log(
+        "Connected wallet address:",
+        wallet.account?.address?.toString()
+      );
       console.log("Sender address:", newSender.address?.toString());
     }
   }, [wallet, tonConnectUI]);
@@ -215,7 +221,8 @@ export default function RampPaymentInterface() {
     // Add your payment submission logic here
     console.log("Payment Details:", { amount, network, reference });
     // @ts-expect-error to test run
-    window &&  window.ramp.initialize({
+    window &&
+      window.ramp.initialize({
         // public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
         // production
         public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
