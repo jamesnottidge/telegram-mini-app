@@ -182,7 +182,7 @@ export default function RampPaymentInterface() {
     console.log("Using wallet", sdk.sender?.address?.toString());
     console.log("Using wallet", sdk.sender?.address?.toRawString());
 
-    const jetton = sdk.openJettonWallet(Address.parse(JETTON_ADDRESS));
+    const jetton = sdk.openJetton(Address.parse(JETTON_ADDRESS));
     const receiverAddress = Address.parse(receiverWalletAddress);
     const amountInMicroUSDT = BigInt(parseInt(amount) * 1_000_000); // For USDT (6 decimals)
 
@@ -195,7 +195,9 @@ export default function RampPaymentInterface() {
         .endCell();
     }
 
-    jetton.send(sender, receiverAddress, amountInMicroUSDT, {
+    const myJettonWallet = await jetton.getWallet(sdk.sender!.address!);
+
+    myJettonWallet.send(sender, receiverAddress, amountInMicroUSDT, {
       customPayload: payload,
     });
   };
