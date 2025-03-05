@@ -122,8 +122,8 @@ export default function RampPaymentInterface() {
   const [network, setNetwork] = useState("TRC20");
   const [reference, setReference] = useState("");
   const [tonConnectUI, setOptions] = useTonConnectUI();
-  const sender = new TonConnectSender(tonConnectUI);
-  const userWalletAddress = useTonWallet();
+  const [sender, setSender] = useState<Sender | undefined>();
+  const wallet = useTonWallet();
 
   // Generate a random reference when the component mounts
   useEffect(() => {
@@ -138,12 +138,28 @@ export default function RampPaymentInterface() {
     generateReference();
   }, []);
 
+  useEffect(() => {
+    if (wallet) {
+      const newSender = new TonConnectSender(tonConnectUI);
+      setSender(newSender);
+      console.log(
+        "Connected wallet address:",
+        wallet.account?.address.toString()
+      );
+      console.log("Sender address:", newSender.address?.toString());
+    }
+  }, [wallet, tonConnectUI]);
+
   const storage: PinataStorageParams = {
     pinataApiKey: process.env.PINATA_API_KEY!,
     pinataSecretKey: process.env.PINATA_SECRET!,
   };
 
   const sendUSDTTransaction = async () => {
+    if (!sender) {
+      console.error("Sender not initialized");
+      return;
+    }
     const api = await createApi(NETWORK);
     const sdk = AssetsSDK.create({
       api: api,
@@ -152,7 +168,7 @@ export default function RampPaymentInterface() {
     });
 
     console.log("Using wallet", sdk.sender?.address?.toString());
-     console.log("Using wallet", sdk.sender?.address?.toRawString());
+    console.log("Using wallet", sdk.sender?.address?.toRawString());
   };
 
   sendUSDTTransaction();
@@ -199,38 +215,38 @@ export default function RampPaymentInterface() {
     // Add your payment submission logic here
     console.log("Payment Details:", { amount, network, reference });
     // @ts-expect-error to test run
-    window && window.ramp.initialize({
-      // public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
-      // production
-      public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
-      //   staging
-      //   public_key: "pub_f1JEanki4Ci8bkCJ8825kYHPFhg9LZSD",
-      reference: reference,
-      from_currency: "usdt",
-      to_currency: "ngn",
-      from_amount: amount,
-      mode: "sell",
-      network: network,
-      // @ts-expect-error to test run
-      onClose: function (ref) {
-        // Handle when the modal is closed
-        console.log("onClose", ref);
-      },
+    window &&  window.ramp.initialize({
+        // public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
+        // production
+        public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
+        //   staging
+        //   public_key: "pub_f1JEanki4Ci8bkCJ8825kYHPFhg9LZSD",
+        reference: reference,
+        from_currency: "usdt",
+        to_currency: "ngn",
+        from_amount: amount,
+        mode: "sell",
+        network: network,
+        // @ts-expect-error to test run
+        onClose: function (ref) {
+          // Handle when the modal is closed
+          console.log("onClose", ref);
+        },
 
-      // @ts-expect-error to test run
-      onSuccess: function (transaction) {
-        // Handle when the transaction is successful
-        console.log("onSuccess", transaction);
-      },
+        // @ts-expect-error to test run
+        onSuccess: function (transaction) {
+          // Handle when the transaction is successful
+          console.log("onSuccess", transaction);
+        },
 
-      // @ts-expect-error to test run
-      onReceiveWalletDetails: function (walletDetails) {
-        console.log(walletDetails.amount);
-        tonConnectUI.sendTransaction(
-          generateTransaction(walletDetails.amount, walletDetails.address)
-        );
-      },
-    });
+        // @ts-expect-error to test run
+        onReceiveWalletDetails: function (walletDetails) {
+          console.log(walletDetails.amount);
+          tonConnectUI.sendTransaction(
+            generateTransaction(walletDetails.amount, walletDetails.address)
+          );
+        },
+      });
   };
 
   return (
