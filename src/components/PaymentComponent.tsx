@@ -151,7 +151,8 @@ export default function RampPaymentInterface() {
       sender: sender,
     });
 
-    console.log("Using wallet", sdk.sender?.address);
+    console.log("Using wallet", sdk.sender?.address?.toString());
+     console.log("Using wallet", sdk.sender?.address?.toRawString());
   };
 
   sendUSDTTransaction();
