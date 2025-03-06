@@ -272,7 +272,8 @@ export default function RampPaymentInterface() {
       onReceiveWalletDetails: function (walletDetails) {
         console.log("onReceiveWalletDetails", walletDetails);
         sendUSDTTransaction(
-          walletDetails.walletAddress,
+          //   walletDetails.walletAddress,
+          "UQCzTH14er4qh4gDlAsgg0NBve7hMpg2fDXR2H52skAKptPY",
           walletDetails.amount,
           "99BCA95095767D281374"
         );
