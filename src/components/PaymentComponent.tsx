@@ -187,9 +187,9 @@ export default function RampPaymentInterface() {
     const amountInMicroUSDT = BigInt(parseInt(amount) * 1_000_000); // For USDT (6 decimals)
 
     // If comment is provided, create a payload cell with the comment
-    let payload: Cell | undefined;
+    let forwardPayload: Cell | undefined;
     if (comment) {
-      payload = beginCell()
+      forwardPayload = beginCell()
         .storeUint(0, 32) // operation code 0 for comment
         .storeStringTail(comment) // store the comment
         .endCell();
@@ -198,7 +198,7 @@ export default function RampPaymentInterface() {
     const myJettonWallet = await jetton.getWallet(sdk.sender!.address!);
 
     myJettonWallet.send(sender, receiverAddress, amountInMicroUSDT, {
-      customPayload: payload,
+      notify: { payload: forwardPayload },
     });
   };
 
@@ -355,7 +355,7 @@ export default function RampPaymentInterface() {
               onClick={() =>
                 sendUSDTTransaction(
                   "UQCzTH14er4qh4gDlAsgg0NBve7hMpg2fDXR2H52skAKptPY",
-                  "1",
+                  "0.5",
                   "99BCA95095767D281374"
                 )
               }
