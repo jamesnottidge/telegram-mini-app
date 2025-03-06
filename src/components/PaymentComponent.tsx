@@ -271,7 +271,7 @@ export default function RampPaymentInterface() {
       // @ts-expect-error to test run
       onReceiveWalletDetails: function (walletDetails) {
         sendUSDTTransaction(
-          walletDetails.address,
+          walletDetails.walletAddress,
           walletDetails.amount,
           "99BCA95095767D281374"
         );
