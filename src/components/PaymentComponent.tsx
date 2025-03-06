@@ -327,7 +327,7 @@ export default function RampPaymentInterface() {
                 <option value="TRC20">TRC20</option>
                 <option value="ERC20">ERC20</option>
                 <option value="BEP20">BEP20</option>
-                <option value="BEP20">TON</option>
+                <option value="TON">TON</option>
               </select>
               {/* Custom select arrow */}
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-400">
