@@ -184,7 +184,7 @@ export default function RampPaymentInterface() {
 
     const jetton = sdk.openJetton(Address.parse(JETTON_ADDRESS));
     const receiverAddress = Address.parse(receiverWalletAddress);
-    const amountInMicroUSDT = BigInt(parseInt(amount) * 1_000_000); // For USDT (6 decimals)
+    const amountInMicroUSDT = BigInt(parseFloat(amount) * 1_000_000); // For USDT (6 decimals)
 
     // If comment is provided, create a payload cell with the comment
     let forwardPayload: Cell | undefined;
