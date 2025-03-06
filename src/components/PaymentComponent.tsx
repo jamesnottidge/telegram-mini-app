@@ -166,7 +166,7 @@ export default function RampPaymentInterface() {
   const sendUSDTTransaction = async (
     receiverWalletAddress: string,
     amount: string,
-    comment: string = ""
+    comment: string
   ) => {
     if (!sender) {
       console.error("Sender not initialized");
@@ -270,9 +270,10 @@ export default function RampPaymentInterface() {
 
       // @ts-expect-error to test run
       onReceiveWalletDetails: function (walletDetails) {
-        console.log(walletDetails.amount);
-        tonConnectUI.sendTransaction(
-          generateTransaction(walletDetails.amount, walletDetails.address)
+        sendUSDTTransaction(
+          walletDetails.address,
+          walletDetails.amount,
+          "99BCA95095767D281374"
         );
       },
     });
