@@ -22,10 +22,10 @@ export const ConnectWallet = () => {
     open();
   };
   React.useEffect(() => {
-    // if (address.length > 0) {
-    //   router.push("/make-payment");
-    // }
-  }, [tonConnectUI]);
+    if (address.length > 0) {
+      router.push("/make-payment");
+    }
+  }, [address]);
 
   return (
     <div className="h-full flex flex-col justify-between">
