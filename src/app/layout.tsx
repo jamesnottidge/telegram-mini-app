@@ -3,17 +3,7 @@ import localFont from "next/font/local";
 import TonProvider from "@/components/TonProvider";
 import Script from "next/script";
 import "./globals.css";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import { UncutSans } from "../../public/fonts/fonts";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -27,14 +17,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${UncutSans.className} antialiased`}>
         <Script
           src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"
           strategy="beforeInteractive"
         />
-        <TonProvider>{children}</TonProvider>
+        <TonProvider>
+          <div className="flex justify-center items-center w-full h-[100vh] bg-red-50">
+            <div className="h-full max-h-[812px]  max-w-[400px] w-full">
+              {children}
+            </div>
+          </div>
+        </TonProvider>
       </body>
     </html>
   );

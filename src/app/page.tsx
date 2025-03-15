@@ -4,6 +4,7 @@ import WebApp from "@twa-dev/sdk";
 import { useEffect } from "react";
 import { TonConnectButton } from "@tonconnect/ui-react";
 import RampPaymentInterface from "@/components/PaymentComponent";
+import { ConnectWallet } from "@/components/connect-wallet";
 
 export default function App() {
   useEffect(() => {
@@ -11,14 +12,14 @@ export default function App() {
   }, []);
 
   return (
-    <div>
-      <div className="flex justify-end">
+    <div className="h-full px-6">
+      {/* <div className="flex justify-end">
         <TonConnectButton />
       </div>
-      <h1>My App</h1>
       <div>
         <RampPaymentInterface />
-      </div>
+      </div> */}
+      <ConnectWallet />
     </div>
   );
 }
