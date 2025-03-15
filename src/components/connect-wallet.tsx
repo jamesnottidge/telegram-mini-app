@@ -2,12 +2,22 @@ import React from "react";
 import { QuidaxLogo } from "./quidax-logo";
 import { Button } from "./ui/button";
 import { TonConnectUI } from "@tonconnect/ui-react";
-import { useTonConnectUI, useTonConnectModal } from "@tonconnect/ui-react";
+import {
+  useTonConnectUI,
+  useTonConnectModal,
+  useTonWallet,
+} from "@tonconnect/ui-react";
 import { TonConnectButton } from "@tonconnect/ui-react";
+import { useRouter } from "next/navigation";
 
 export const ConnectWallet = () => {
-  const [_, setOptions] = useTonConnectUI();
-   const { state, open, close } = useTonConnectModal();
+  const wallet = useTonWallet();
+  const { state, open, close } = useTonConnectModal();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (wallet) router.push("/make-payment");
+  }, []);
 
   return (
     <div className="h-full flex flex-col justify-between">
@@ -29,10 +39,7 @@ export const ConnectWallet = () => {
           id="custom-ton-connect-button"
           text="Connect Ton Wallet"
         />
-        <TonConnectButton
-          className="bg-brand-700"
-          style={{ backgroundColor: "purple" }}
-        />
+      
       </div>
     </div>
   );

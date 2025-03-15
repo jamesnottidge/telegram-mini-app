@@ -3,8 +3,8 @@
 import WebApp from "@twa-dev/sdk";
 import { useEffect } from "react";
 import { TonConnectButton } from "@tonconnect/ui-react";
-import RampPaymentInterface from "@/components/PaymentComponent";
 import { ConnectWallet } from "@/components/connect-wallet";
+import RampPaymentComponent from "@/components/PaymentComponent";
 
 export default function App() {
   useEffect(() => {
@@ -19,8 +19,7 @@ export default function App() {
       <div>
         <RampPaymentInterface />
       </div> */}
-      <ConnectWallet />
+      <RampPaymentComponent />
     </div>
   );
 }
-

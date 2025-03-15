@@ -21,7 +21,7 @@ import {
   createApi,
   PinataStorageParams,
 } from "@ton-community/assets-sdk";
-
+import { TonConnectButton } from "@tonconnect/ui-react";
 import { TonClient } from "@ton/ton";
 import { getHttpEndpoint } from "@orbs-network/ton-access";
 
@@ -119,7 +119,7 @@ class TonConnectSender implements Sender {
 
 const JETTON_ADDRESS = "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs";
 
-export default function RampPaymentInterface() {
+export default function RampPaymentComponent() {
   const [amount, setAmount] = useState("");
   const [network, setNetwork] = useState("TRC20");
   const [reference, setReference] = useState("");
@@ -285,6 +285,10 @@ export default function RampPaymentInterface() {
     <div className=" bg-neutral-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-neutral-100 overflow-hidden">
         <div className="p-6 space-y-6">
+          <TonConnectButton
+            className="bg-brand-700"
+            style={{ backgroundColor: "purple" }}
+          />
           <h2 className="text-2xl font-semibold text-neutral-800 text-center">
             Ramp Payment
           </h2>
