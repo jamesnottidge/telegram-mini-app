@@ -23,16 +23,16 @@ export const ConnectWallet = () => {
           </p>
         </div>
       </div>
-      <div className="flex justify-center">
+      <div className="flex  flex-col justify-center">
         <Button
           onClick={open}
           id="custom-ton-connect-button"
           text="Connect Ton Wallet"
         />
-        {/* <TonConnectButton
+        <TonConnectButton
           className="bg-brand-700"
           style={{ backgroundColor: "purple" }}
-        /> */}
+        />
       </div>
     </div>
   );
