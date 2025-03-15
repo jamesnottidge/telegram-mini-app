@@ -1,7 +1,7 @@
 import React from "react";
 import { QuidaxLogo } from "./quidax-logo";
 import { Button } from "./ui/button";
-import { TonConnectUI } from "@tonconnect/ui-react";
+import { TonConnectUI, useTonAddress } from "@tonconnect/ui-react";
 import {
   useTonConnectUI,
   useTonConnectModal,
@@ -12,12 +12,20 @@ import { useRouter } from "next/navigation";
 
 export const ConnectWallet = () => {
   const wallet = useTonWallet();
+  const address = useTonAddress();
   const { state, open, close } = useTonConnectModal();
+  const [tonConnectUI, setOptions] = useTonConnectUI();
   const router = useRouter();
 
+  const handleClick = async () => {
+    await tonConnectUI.disconnect();
+    open();
+  };
   React.useEffect(() => {
-    if (wallet) router.push("/make-payment");
-  }, []);
+    // if (address.length > 0) {
+    //   router.push("/make-payment");
+    // }
+  }, [tonConnectUI]);
 
   return (
     <div className="h-full flex flex-col justify-between">
@@ -35,11 +43,10 @@ export const ConnectWallet = () => {
       </div>
       <div className="flex  flex-col justify-center">
         <Button
-          onClick={open}
+          onClick={handleClick}
           id="custom-ton-connect-button"
           text="Connect Ton Wallet"
         />
-      
       </div>
     </div>
   );
