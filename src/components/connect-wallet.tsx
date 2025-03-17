@@ -42,6 +42,7 @@ export const ConnectWallet = () => {
         </div>
       </div>
       <div className="flex  flex-col justify-center">
+        <TonConnectButton />
         <Button
           onClick={handleClick}
           id="custom-ton-connect-button"
