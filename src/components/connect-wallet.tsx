@@ -18,7 +18,7 @@ export const ConnectWallet = () => {
   const router = useRouter();
 
   const handleClick = async () => {
-    await tonConnectUI.disconnect();
+    // await tonConnectUI.disconnect();
     open();
   };
   React.useEffect(() => {
