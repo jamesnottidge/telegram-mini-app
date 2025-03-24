@@ -140,15 +140,14 @@ export default function RampPaymentComponent() {
 
   useEffect(() => {
     if (address.length === 0) {
-        router.push("/");
+      // router.push("/");
     }
   }, [address]);
 
-    const storage: PinataStorageParams = {
-      pinataApiKey: process.env.PINATA_API_KEY!,
-      pinataSecretKey: process.env.PINATA_SECRET!,
-    };
-
+  const storage: PinataStorageParams = {
+    pinataApiKey: process.env.PINATA_API_KEY!,
+    pinataSecretKey: process.env.PINATA_SECRET!,
+  };
 
   // Generate a random reference when the component mounts
   useEffect(() => {
@@ -177,7 +176,7 @@ export default function RampPaymentComponent() {
         wallet.account?.address?.toString()
       );
       console.log("Sender address:", newSender.address?.toString());
-    
+
       const getUSDTBalance = async () => {
         const api = await createApi(NETWORK);
         const sdk = AssetsSDK.create({
@@ -186,23 +185,19 @@ export default function RampPaymentComponent() {
           sender: newSender,
         });
 
-
         console.log("Using wallet", sdk.sender?.address?.toString());
         console.log("Using wallet", sdk.sender?.address?.toRawString());
 
         const jetton = sdk.openJetton(Address.parse(JETTON_ADDRESS));
         const myJettonWallet = await jetton.getWallet(sdk.sender!.address!);
         const balance = (await myJettonWallet.getData()).balance;
-        setUserWalletBalance(balance);
+        setUserWalletBalance(balance * BigInt(0.000001));
         console.log(balance);
         return balance;
       };
       getUSDTBalance();
     }
   }, [wallet, tonConnectUI]);
-
-
-
 
   const sendUSDTTransaction = async (
     receiverWalletAddress: string,
