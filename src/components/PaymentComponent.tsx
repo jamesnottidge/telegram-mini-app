@@ -416,7 +416,7 @@ export default function RampPaymentComponent() {
         <Button
           onClick={handleSubmit}
           text="Continue"
-          disabled={address.length === 0}
+          disabled={address.length === 0 || !userWalletBalance}
         />
       </div>
     </div>
