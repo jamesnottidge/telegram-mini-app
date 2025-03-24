@@ -5,8 +5,10 @@ import {
   SendTransactionRequest,
   useTonConnectUI,
   useTonWallet,
+  useTonAddress,
 } from "@tonconnect/ui-react";
 import { OpenedContract, Cell } from "@ton/core";
+import { useRouter } from "next/navigation";
 import {
   Address,
   beginCell,
@@ -24,6 +26,10 @@ import {
 import { TonConnectButton } from "@tonconnect/ui-react";
 import { TonClient } from "@ton/ton";
 import { getHttpEndpoint } from "@orbs-network/ton-access";
+import { QuidaxLogo } from "./quidax-logo";
+import Image from "next/image";
+import { Button } from "./ui/button";
+import { Loader2 } from "lucide-react";
 
 const USDT_JETTON_MASTER = "0";
 const NETWORK = "mainnet";
@@ -125,7 +131,18 @@ export default function RampPaymentComponent() {
   const [reference, setReference] = useState("");
   const [tonConnectUI, setOptions] = useTonConnectUI();
   const [sender, setSender] = useState<Sender | undefined>();
+  const [userWalletBalance, setUserWalletBalance] = useState<bigint | null>(
+    null
+  );
   const wallet = useTonWallet();
+  const address = useTonAddress();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (address.length === 0) {
+      //   router.push("/");
+    }
+  }, [address]);
 
   // Generate a random reference when the component mounts
   useEffect(() => {
@@ -136,7 +153,7 @@ export default function RampPaymentComponent() {
         Math.random().toString(36).substring(2, 15);
       setReference(`${prefix}${randomPart}`);
     };
-
+    getUSDTBalance();
     generateReference();
   }, []);
 
@@ -161,6 +178,25 @@ export default function RampPaymentComponent() {
   const storage: PinataStorageParams = {
     pinataApiKey: process.env.PINATA_API_KEY!,
     pinataSecretKey: process.env.PINATA_SECRET!,
+  };
+
+  const getUSDTBalance = async () => {
+    const api = await createApi(NETWORK);
+    const sdk = AssetsSDK.create({
+      api: api,
+      storage: storage,
+      sender: sender,
+    });
+
+    console.log("Using wallet", sdk.sender?.address?.toString());
+    console.log("Using wallet", sdk.sender?.address?.toRawString());
+
+    const jetton = sdk.openJetton(Address.parse(JETTON_ADDRESS));
+    const myJettonWallet = await jetton.getWallet(sdk.sender!.address!);
+    const balance = (await myJettonWallet.getData()).balance;
+    setUserWalletBalance(balance);
+    console.log(balance);
+    return balance;
   };
 
   const sendUSDTTransaction = async (
@@ -282,102 +318,111 @@ export default function RampPaymentComponent() {
   };
 
   return (
-    <div className=" bg-neutral-50 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-neutral-100 overflow-hidden">
-        <div className="p-6 space-y-6">
-          <TonConnectButton
-            className="bg-brand-700"
-            style={{ backgroundColor: "purple" }}
-          />
-          <h2 className="text-2xl font-semibold text-neutral-800 text-center">
-            Ramp Payment
-          </h2>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="amount"
-                className="block text-sm font-medium text-neutral-600 mb-2"
-              >
-                Amount (USDT)
-              </label>
-              <input
-                type="number"
-                id="amount"
-                value={amount}
-                onChange={handleAmountChange}
-                placeholder="Enter amount"
-                className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 
-                           focus:border-neutral-400 focus:outline-none 
-                           focus:ring-0 text-neutral-800 
-                           placeholder-neutral-400 transition-colors duration-200"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="network"
-                className="block text-sm font-medium text-neutral-600 mb-2"
-              >
-                Select Network
-              </label>
-              <select
-                id="network"
-                value={network}
-                onChange={handleNetworkChange}
-                className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 
-                           focus:border-neutral-400 focus:outline-none 
-                           focus:ring-0 text-neutral-800 
-                           appearance-none"
-              >
-                <option value="TRC20">TRC20</option>
-                <option value="ERC20">ERC20</option>
-                <option value="BEP20">BEP20</option>
-                <option value="TON">TON</option>
-              </select>
-              {/* Custom select arrow */}
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-400">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
-              </div>
-            </div>
-            <button
-              type="submit"
-              className="w-full py-3 bg-neutral-800 text-white rounded-lg 
-                         hover:bg-neutral-700 focus:outline-none 
-                         focus:ring-2 focus:ring-neutral-500 
-                         transition-colors duration-300"
-            >
-              Continue to Payment
-            </button>
-            <button
-              className="w-full py-3 bg-neutral-800 text-white rounded-lg 
-                         hover:bg-neutral-700 focus:outline-none 
-                         focus:ring-2 focus:ring-neutral-500 
-                         transition-colors duration-300"
-              onClick={() =>
-                sendUSDTTransaction(
-                  "UQCzTH14er4qh4gDlAsgg0NBve7hMpg2fDXR2H52skAKptPY",
-                  "0.5",
-                  "99BCA95095767D281374"
-                )
-              }
-            >
-              Send USDT
-            </button>
-          </form>
-
-          {reference && (
-            <div className="text-center text-sm text-neutral-500 mt-4">
-              Reference: <span className="font-mono">{reference}</span>
-            </div>
-          )}
+    <div className="h-full flex flex-col justify-between">
+      <div>
+        <div>
+          <div className="flex justify-end mb-10">
+            <TonConnectButton />
+          </div>
+          <QuidaxLogo />
         </div>
+
+        <div className="mt-11">
+          <div className="">
+            <h2 className="text-xl font-medium">Make Payment</h2>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="amount"
+                  className="block text-xs font-medium  mb-2 mt-4 text-[#201749]"
+                >
+                  Enter amount
+                </label>
+                <div className="flex gap-2">
+                  <div className="flex justify-center align-center px-4 rounded-lg bg-gray-50 ">
+                    <Image
+                      src={"/svgs/tether.svg"}
+                      width={24}
+                      height={24}
+                      alt="Tether Logo"
+                    />
+                  </div>
+                  <input
+                    type="string"
+                    id="amount"
+                    value={amount}
+                    onChange={handleAmountChange}
+                    placeholder="0.00"
+                    className="w-full px-3 py-2.5 rounded-lg border border-[#EFEFEF] bg-gray-50 text-sm h-[48px]
+                  focus:border-brand-700 focus:outline-none 
+                  focus:ring-0 text-[#4C4A45] text-right
+                  placeholder-neutral-400 transition-colors duration-200"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="font-normal text-xs text-[#4C4A55]">
+                <p>Available Balance - </p>
+                <p>
+                  {userWalletBalance ? (
+                    `USDT ${userWalletBalance.toString()}`
+                  ) : (
+                    <Loader2 className="animate-spin" />
+                  )}
+                </p>
+              </div>
+              <div>
+                <label
+                  htmlFor="network"
+                  className="block text-sm font-medium text-[#201749] mb-2"
+                >
+                  Network
+                </label>
+                <p
+                  id="network"
+                  className="w-full px-3 py-2.5 rounded-lg border border-neutral-200 
+                           focus:border-neutral-400 focus:outline-none bg-gray-50
+                           focus:ring-0 text-[#4C4A45]
+                           appearance-none"
+                >
+                  TON
+                </p>
+              </div>
+              {/* <button
+                type="submit"
+                className="w-full py-3 bg-neutral-800 text-white rounded-lg 
+                         hover:bg-neutral-700 focus:outline-none 
+                         focus:ring-2 focus:ring-neutral-500 
+                         transition-colors duration-300"
+              >
+                Continue to Payment
+              </button>
+              <button
+                className="w-full py-3 bg-neutral-800 text-white rounded-lg 
+                         hover:bg-neutral-700 focus:outline-none 
+                         focus:ring-2 focus:ring-neutral-500 
+                         transition-colors duration-300"
+                onClick={() =>
+                  sendUSDTTransaction(
+                    "UQCzTH14er4qh4gDlAsgg0NBve7hMpg2fDXR2H52skAKptPY",
+                    "0.5",
+                    "99BCA95095767D281374"
+                  )
+                }
+              >
+                Send USDT
+              </button> */}
+            </form>
+          </div>
+        </div>
+      </div>
+      <div>
+        <Button
+          onClick={handleSubmit}
+          text="Continue"
+          disabled={address.length === 0}
+        />
       </div>
     </div>
   );

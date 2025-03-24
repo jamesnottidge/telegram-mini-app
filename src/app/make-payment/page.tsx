@@ -13,12 +13,7 @@ export default function App() {
 
   return (
     <div className="h-full px-6">
-      {/* <div className="flex justify-end">
-        <TonConnectButton />
-      </div>
-      <div>
-        <RampPaymentInterface />
-      </div> */}
+   
       <RampPaymentComponent />
     </div>
   );

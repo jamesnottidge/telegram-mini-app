@@ -23,7 +23,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
         <TonProvider>
-          <div className="flex justify-center items-center w-full h-[100vh] bg-red-50">
+          <div className="flex justify-center items-center w-full h-[100vh] bg-red-50 py-2">
             <div className="h-full max-h-[812px]  max-w-[400px] w-full">
               {children}
             </div>

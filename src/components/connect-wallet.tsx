@@ -18,10 +18,14 @@ export const ConnectWallet = () => {
   const router = useRouter();
 
   const handleClick = async () => {
-    // await tonConnectUI.disconnect();
-    open();
+    if (address.length > 0) {
+      await tonConnectUI.disconnect();
+      open();
+    } else {
+      open();
+    }
   };
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (address.length > 0) {
       router.push("/make-payment");
     }
