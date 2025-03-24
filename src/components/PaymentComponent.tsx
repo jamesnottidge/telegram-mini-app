@@ -140,7 +140,7 @@ export default function RampPaymentComponent() {
 
   useEffect(() => {
     if (address.length === 0) {
-      // router.push("/");
+      router.push("/");
     }
   }, [address]);
 
@@ -191,7 +191,7 @@ export default function RampPaymentComponent() {
         const jetton = sdk.openJetton(Address.parse(JETTON_ADDRESS));
         const myJettonWallet = await jetton.getWallet(sdk.sender!.address!);
         const balance = (await myJettonWallet.getData()).balance;
-        setUserWalletBalance(balance * BigInt(0.000001));
+        setUserWalletBalance(balance / BigInt(1000000));
         console.log(balance);
         return balance;
       };
