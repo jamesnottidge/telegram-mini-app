@@ -131,7 +131,7 @@ export default function RampPaymentComponent() {
   const [reference, setReference] = useState("");
   const [tonConnectUI, setOptions] = useTonConnectUI();
   const [sender, setSender] = useState<Sender | undefined>();
-  const [userWalletBalance, setUserWalletBalance] = useState<bigint | null>(
+  const [userWalletBalance, setUserWalletBalance] = useState<number | null>(
     null
   );
   const wallet = useTonWallet();
@@ -140,7 +140,7 @@ export default function RampPaymentComponent() {
 
   useEffect(() => {
     if (address.length === 0) {
-      router.push("/");
+      //   router.push("/");
     }
   }, [address]);
 
@@ -150,6 +150,18 @@ export default function RampPaymentComponent() {
   };
 
   // Generate a random reference when the component mounts
+  function setUserWalletBalanceHelperFunction(balance: bigint) {
+    const divisor = BigInt(1000000);
+    const wholePart = balance / divisor;
+    const remainder = balance % divisor;
+
+    const wholePartFloat = Number(wholePart);
+    const remainderFloat = Number(remainder) / Number(divisor);
+
+    const result = wholePartFloat + remainderFloat;
+
+    setUserWalletBalance(result);
+  }
   useEffect(() => {
     const generateReference = () => {
       const prefix = "REF_";
@@ -191,7 +203,7 @@ export default function RampPaymentComponent() {
         const jetton = sdk.openJetton(Address.parse(JETTON_ADDRESS));
         const myJettonWallet = await jetton.getWallet(sdk.sender!.address!);
         const balance = (await myJettonWallet.getData()).balance;
-        setUserWalletBalance(balance / BigInt(1000000));
+        setUserWalletBalanceHelperFunction(balance);
         console.log(balance);
         return balance;
       };
