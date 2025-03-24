@@ -144,6 +144,12 @@ export default function RampPaymentComponent() {
     }
   }, [address]);
 
+    const storage: PinataStorageParams = {
+      pinataApiKey: process.env.PINATA_API_KEY!,
+      pinataSecretKey: process.env.PINATA_SECRET!,
+    };
+
+
   // Generate a random reference when the component mounts
   useEffect(() => {
     const generateReference = () => {
@@ -153,7 +159,6 @@ export default function RampPaymentComponent() {
         Math.random().toString(36).substring(2, 15);
       setReference(`${prefix}${randomPart}`);
     };
-    getUSDTBalance();
     generateReference();
   }, []);
 
@@ -172,32 +177,32 @@ export default function RampPaymentComponent() {
         wallet.account?.address?.toString()
       );
       console.log("Sender address:", newSender.address?.toString());
+    
+      const getUSDTBalance = async () => {
+        const api = await createApi(NETWORK);
+        const sdk = AssetsSDK.create({
+          api: api,
+          storage: storage,
+          sender: newSender,
+        });
+
+
+        console.log("Using wallet", sdk.sender?.address?.toString());
+        console.log("Using wallet", sdk.sender?.address?.toRawString());
+
+        const jetton = sdk.openJetton(Address.parse(JETTON_ADDRESS));
+        const myJettonWallet = await jetton.getWallet(sdk.sender!.address!);
+        const balance = (await myJettonWallet.getData()).balance;
+        setUserWalletBalance(balance);
+        console.log(balance);
+        return balance;
+      };
+      getUSDTBalance();
     }
   }, [wallet, tonConnectUI]);
 
-  const storage: PinataStorageParams = {
-    pinataApiKey: process.env.PINATA_API_KEY!,
-    pinataSecretKey: process.env.PINATA_SECRET!,
-  };
 
-  const getUSDTBalance = async () => {
-    const api = await createApi(NETWORK);
-    const sdk = AssetsSDK.create({
-      api: api,
-      storage: storage,
-      sender: sender,
-    });
 
-    console.log("Using wallet", sdk.sender?.address?.toString());
-    console.log("Using wallet", sdk.sender?.address?.toRawString());
-
-    const jetton = sdk.openJetton(Address.parse(JETTON_ADDRESS));
-    const myJettonWallet = await jetton.getWallet(sdk.sender!.address!);
-    const balance = (await myJettonWallet.getData()).balance;
-    setUserWalletBalance(balance);
-    console.log(balance);
-    return balance;
-  };
 
   const sendUSDTTransaction = async (
     receiverWalletAddress: string,
