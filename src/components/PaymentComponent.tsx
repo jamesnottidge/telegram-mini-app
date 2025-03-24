@@ -141,7 +141,7 @@ export default function RampPaymentComponent() {
 
   useEffect(() => {
     if (address.length === 0) {
-      router.push("/");
+        router.push("/");
     }
   }, [address]);
 
@@ -416,7 +416,12 @@ export default function RampPaymentComponent() {
         <Button
           onClick={handleSubmit}
           text="Continue"
-          disabled={address.length === 0 || !userWalletBalance}
+          disabled={
+            address.length === 0 ||
+            !userWalletBalance ||
+            amount === "" ||
+            Number(amount) > (userWalletBalance ?? 0)
+          }
         />
       </div>
     </div>
