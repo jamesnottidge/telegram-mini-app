@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import {
   SendTransactionRequest,
   useTonConnectUI,
@@ -140,7 +141,7 @@ export default function RampPaymentComponent() {
 
   useEffect(() => {
     if (address.length === 0) {
-      //   router.push("/");
+      router.push("/");
     }
   }, [address]);
 
@@ -211,11 +212,15 @@ export default function RampPaymentComponent() {
     }
   }, [wallet, tonConnectUI]);
 
-  const sendUSDTTransaction = async (
-    receiverWalletAddress: string,
-    amount: string,
-    comment: string
-  ) => {
+  const sendUSDTTransaction = async ({
+    receiverWalletAddress,
+    amount,
+    comment,
+  }: {
+    receiverWalletAddress: string;
+    amount: string;
+    comment: string;
+  }) => {
     if (!sender) {
       console.error("Sender not initialized");
       return;
@@ -250,37 +255,8 @@ export default function RampPaymentComponent() {
     });
   };
 
-  //   useEffect(() => {
-  //     if (!userWalletAddress) return;
-
-  //     const fetchBalance = async () => {
-  //       const endpoint = await getHttpEndpoint();
-  //       const client = new TonClient({
-  //         endpoint: endpoint,
-  //       });
-
-  //        const jettonMasterContract = client.open(
-  //          Contract.fromAddress(Address.parse(USDT_JETTON_MASTER))
-  //        );
-
-  //       const jettonWalletAddress = await client.callGetMethod(
-  //         Address.parse(USDT_JETTON_MASTER),
-  //         "get_wallet_address",
-  //         [["addr", Address.parse(userWalletAddress)]]
-  //       );
-
-  //       const balanceResponse = await client.callGetMethod(
-  //         jettonWalletAddress,
-  //         "get_balance"
-  //       );
-  //       setBalance(balanceResponse[0].toString());
-  //     };
-
-  //     fetchBalance();
-  //   }, [walletAddress]);
-
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(e.target.value);
+    setAmount(e.target.value.toString());
   };
 
   const handleNetworkChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -293,7 +269,6 @@ export default function RampPaymentComponent() {
     console.log("Payment Details:", { amount, network, reference });
     // @ts-expect-error to test run
     window.ramp.initialize({
-      // public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
       // production
       public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
       //   staging
@@ -319,12 +294,14 @@ export default function RampPaymentComponent() {
       // @ts-expect-error to test run
       onReceiveWalletDetails: function (walletDetails) {
         console.log("onReceiveWalletDetails", walletDetails);
-        sendUSDTTransaction(
-          //   walletDetails.walletAddress,
-          "UQCzTH14er4qh4gDlAsgg0NBve7hMpg2fDXR2H52skAKptPY",
-          walletDetails.amount,
-          "99BCA95095767D281374"
-        );
+        sendUSDTTransaction({
+          //comment: walletDetails.tag,
+          // receiverWalletAddress:  walletDetails.walletAddress,
+          receiverWalletAddress:
+            "UQCzTH14er4qh4gDlAsgg0NBve7hMpg2fDXR2H52skAKptPY",
+          amount: walletDetails.amount,
+          comment: "99BCA95095767D281374",
+        });
       },
     });
   };
@@ -361,28 +338,34 @@ export default function RampPaymentComponent() {
                     />
                   </div>
                   <input
-                    type="string"
+                    disabled={userWalletBalance ? false : true}
+                    type="number"
                     id="amount"
                     value={amount}
                     onChange={handleAmountChange}
                     placeholder="0.00"
-                    className="w-full px-3 py-2.5 rounded-lg border border-[#EFEFEF] bg-gray-50 text-sm h-[48px]
-                  focus:border-brand-700 focus:outline-none 
+                    className={cn(
+                      `w-full px-3 py-2.5 rounded-lg border  bg-gray-50 text-sm h-[48px]
+                   focus:outline-none 
                   focus:ring-0 text-[#4C4A45] text-right
-                  placeholder-neutral-400 transition-colors duration-200"
+                  placeholder-neutral-400 transition-colors duration-200`,
+                      Number(amount) > (userWalletBalance ?? 0)
+                        ? "border-red-500 focus:border-brand-500"
+                        : "border-[#EFEFEF] focus:border-brand-700"
+                    )}
                     required
                   />
                 </div>
               </div>
-              <div className="font-normal text-xs text-[#4C4A55]">
-                <p>Available Balance - </p>
-                <p>
+              <div className="font-normal text-xs text-[#4C4A55]flex justify-start">
+                <span>
+                  Available Balance -
                   {userWalletBalance ? (
-                    `USDT ${userWalletBalance.toString()}`
+                    `USDT ${userWalletBalance.toString()} `
                   ) : (
-                    <Loader2 className="animate-spin" />
+                    <Loader2 className="animate-spin inline ml-1" size={12} />
                   )}
-                </p>
+                </span>
               </div>
               <div>
                 <label
