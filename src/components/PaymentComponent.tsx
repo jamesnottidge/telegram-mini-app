@@ -140,7 +140,7 @@ export default function RampPaymentComponent() {
 
   useEffect(() => {
     if (address.length === 0) {
-      //   router.push("/");
+        router.push("/");
     }
   }, [address]);
 
